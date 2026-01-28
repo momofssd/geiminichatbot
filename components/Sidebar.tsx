@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageSquare, Image as ImageIcon, Sparkles, PlusCircle, Presentation } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Sparkles, PlusCircle, Presentation, TrendingUp } from 'lucide-react';
 import { AppMode } from '../types';
 
 interface SidebarProps {
@@ -67,6 +67,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentMode, setMode, onNewCha
             >
             <Presentation className="w-4 h-4" />
             <span className="hidden md:block">Presentation</span>
+            </button>
+
+            <button
+            onClick={() => setMode(AppMode.STOCK_ANALYSIS)}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-md transition-all text-sm ${
+                currentMode === AppMode.STOCK_ANALYSIS
+                ? 'bg-[#3b3d45] text-white font-semibold'
+                : 'text-gray-300 hover:bg-[#31333F]'
+            }`}
+            >
+            <TrendingUp className="w-4 h-4" />
+            <span className="hidden md:block">Stock Analysis</span>
             </button>
         </div>
       </div>

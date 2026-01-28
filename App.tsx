@@ -3,6 +3,7 @@ import { Sidebar } from './components/Sidebar';
 import { ChatInterface } from './components/ChatInterface';
 import { ImageStudio } from './components/ImageStudio';
 import { PPTBuilder } from './components/PPTBuilder';
+import { StockAnalysis } from './components/StockAnalysis';
 import { AppMode } from './types';
 
 function App() {
@@ -30,6 +31,9 @@ function App() {
         )}
         {currentMode === AppMode.PPT_BUILDER && (
           <PPTBuilder />
+        )}
+        {currentMode === AppMode.STOCK_ANALYSIS && (
+          <StockAnalysis />
         )}
       </main>
     </div>

@@ -9,6 +9,7 @@ export enum AppMode {
   CHAT = 'chat',
   IMAGE_STUDIO = 'image_studio',
   PPT_BUILDER = 'ppt_builder',
+  STOCK_ANALYSIS = 'stock_analysis',
 }
 
 export enum ImageGenSize {

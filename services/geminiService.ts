@@ -201,3 +201,29 @@ export const generateSlideContent = async (topic: string, count: number): Promis
   }
   return null;
 };
+
+export const analyzeStock = async (ticker: string) => {
+  const ai = getAI();
+  const response = await ai.models.generateContent({
+    model: ModelId.GEMINI_3_PRO,
+    contents: `Perform a deep-dive investment analysis on ${ticker}.
+    
+    Persona: You are a Senior Equity Research Analyst at a top-tier Wall Street hedge fund. 
+    Tone: Professional, Objective, Data-Driven, Critical.
+    
+    Requirements:
+    1. Use Google Search to fetch real-time price, recent news, and financial data.
+    2. Analyze Valuation (P/E, Market Cap, EV/EBITDA vs Peers).
+    3. Evaluate the Competitive Moat & Growth Drivers.
+    4. Assess Risks (Macro, Regulatory, Execution).
+    5. Provide a Technical Analysis overview (Trends, Support/Resistance).
+    6. Conclude with an Institutional Verdict: BUY, SELL, or HOLD, with a clear thesis.
+    
+    Format using Markdown with clear headers.`,
+    config: {
+      tools: [{ googleSearch: {} }],
+      systemInstruction: "You are a world-class financial analyst. Your analysis must be rigorous, citing numbers and specific events. Do not give generic advice."
+    }
+  });
+  return response;
+};
