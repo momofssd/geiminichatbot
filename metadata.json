@@ -1,0 +1,7 @@
+{
+  "name": "Gemini Omni-Assistant",
+  "description": "A powerful multi-modal AI assistant powered by Gemini. Features intelligent chat, real-time search & maps grounding, and advanced image generation & editing capabilities.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gemini Omni-Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Source Sans Pro', sans-serif;
+        background-color: #0E1117;
+        color: #FAFAFA;
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0E1117; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #4B4B4B; 
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #606060; 
+      }
+      /* Markdown Content Specifics */
+      .markdown-content p {
+        margin-bottom: 1rem;
+        line-height: 1.7;
+      }
+      .markdown-content h1, .markdown-content h2, .markdown-content h3 {
+        color: #FFFFFF;
+        font-weight: 700;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .markdown-content ul, .markdown-content ol {
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+        list-style-type: disc;
+      }
+      .markdown-content ol {
+        list-style-type: decimal;
+      }
+      .markdown-content li {
+        margin-bottom: 0.5rem;
+      }
+      .markdown-content pre {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 0.5rem;
+      }
+      .markdown-content a {
+        color: #60A5FA;
+        text-decoration: underline;
+      }
+      .markdown-content strong {
+        color: #FF4B4B; /* Highlight strong text with accent color for better scanning */
+        font-weight: 600;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+    "react-markdown": "https://esm.sh/react-markdown@^10.1.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "pptxgenjs": "https://esm.sh/pptxgenjs@3.12.0",
+    "react-syntax-highlighter": "https://esm.sh/react-syntax-highlighter@15.5.0",
+    "react-syntax-highlighter/dist/esm/styles/prism": "https://esm.sh/react-syntax-highlighter@15.5.0/dist/esm/styles/prism",
+    "mammoth": "https://esm.sh/mammoth@1.6.0",
+    "xlsx": "https://esm.sh/xlsx@0.18.5",
+    "react-syntax-highlighter/": "https://esm.sh/react-syntax-highlighter@^16.1.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
