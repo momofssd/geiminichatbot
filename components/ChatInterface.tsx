@@ -23,6 +23,7 @@ export const ChatInterface: React.FC = () => {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -31,6 +32,14 @@ export const ChatInterface: React.FC = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 200) + 'px';
+    }
+  }, [inputText]);
 
   const processFile = async (file: File) => {
     setIsProcessingFile(true);
@@ -146,6 +155,13 @@ export const ChatInterface: React.FC = () => {
 
   const removeAttachment = (id: string) => {
     setAttachments(prev => prev.filter(a => a.id !== id));
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -346,21 +362,24 @@ export const ChatInterface: React.FC = () => {
              </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex gap-2">
+        <form onSubmit={handleSubmit} className="flex gap-2 items-end">
             <div className="relative flex-1">
-                <input
-                    type="text"
+                <textarea
+                    ref={textareaRef}
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     onPaste={handlePaste}
-                    placeholder="Message Gemini... (Drag & Drop files)"
-                    className="w-full bg-[#262730] text-white placeholder-gray-500 rounded-md px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#FF4B4B] border border-transparent pr-10"
+                    placeholder="Message Gemini... (Shift+Enter for new line)"
+                    className="w-full bg-[#262730] text-white placeholder-gray-500 rounded-md px-4 py-3 focus:outline-none focus:ring-1 focus:ring-[#FF4B4B] border border-transparent pr-10 resize-none overflow-hidden min-h-[50px] max-h-[200px]"
                     disabled={isStreaming}
+                    rows={1}
+                    style={{ height: '50px' }}
                 />
                 <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-white hover:bg-[#3b3d45] rounded-full transition-colors"
+                    className="absolute right-2 bottom-3 p-2 text-gray-400 hover:text-white hover:bg-[#3b3d45] rounded-full transition-colors"
                     title="Attach files (Image, PDF, Word, Excel)"
                 >
                     <Paperclip size={20} />
@@ -378,13 +397,13 @@ export const ChatInterface: React.FC = () => {
             <button
                 type="submit"
                 disabled={(!inputText.trim() && attachments.length === 0) || isStreaming || isProcessingFile}
-                className="px-6 py-3 bg-[#FF4B4B] hover:bg-[#FF3333] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-md font-semibold transition-colors"
+                className="px-6 h-[50px] flex items-center justify-center bg-[#FF4B4B] hover:bg-[#FF3333] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-md font-semibold transition-colors"
             >
                 {isStreaming ? <Loader2 className="animate-spin" size={20} /> : <Send size={20} />}
             </button>
         </form>
         <div className="text-center text-xs text-gray-500 mt-2">
-            Supports: Images, PDF, Word, Excel, Text. Docs are parsed for context.
+            Supports: Images, PDF, Word, Excel, Text. Docs are parsed for context. Shift+Enter for line breaks.
         </div>
       </div>
     </div>
