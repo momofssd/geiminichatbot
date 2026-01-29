@@ -1,9 +1,18 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { ModelId, ImageGenSize, SlideContent, PresentationStructure, Attachment } from "../types";
+import {
+  Attachment,
+  ImageGenSize,
+  ModelId,
+  PresentationStructure,
+} from "../types";
 
 // Helper to ensure API key selection for paid features
 const ensureApiKey = async () => {
-  if (window.aistudio && window.aistudio.hasSelectedApiKey && window.aistudio.openSelectKey) {
+  if (
+    window.aistudio &&
+    window.aistudio.hasSelectedApiKey &&
+    window.aistudio.openSelectKey
+  ) {
     const hasKey = await window.aistudio.hasSelectedApiKey();
     if (!hasKey) {
       await window.aistudio.openSelectKey();
@@ -23,10 +32,10 @@ export const streamChat = async (
   history: { role: string; parts: any[] }[],
   message: string,
   attachments: Attachment[],
-  grounding: { search: boolean }
+  grounding: { search: boolean },
 ) => {
   const ai = getAI();
-  
+
   const tools: any[] = [];
   if (grounding.search) {
     tools.push({ googleSearch: {} });
@@ -34,29 +43,29 @@ export const streamChat = async (
 
   // Construct current turn parts
   const currentParts: any[] = [];
-  
+
   // Handle attachments
   for (const att of attachments) {
-    if (att.mimeType === 'application/pdf') {
+    if (att.mimeType === "application/pdf") {
       // Native PDF support
       currentParts.push({
         inlineData: {
-          mimeType: 'application/pdf',
-          data: att.data
-        }
+          mimeType: "application/pdf",
+          data: att.data,
+        },
       });
-    } else if (att.mimeType.startsWith('image/')) {
+    } else if (att.mimeType.startsWith("image/")) {
       // Native Image support
       currentParts.push({
         inlineData: {
           mimeType: att.mimeType,
-          data: att.data
-        }
+          data: att.data,
+        },
       });
     } else {
       // Text-based files (Docx, Excel converted to text)
       currentParts.push({
-        text: `\n[Context from file "${att.name}":]\n${att.data}\n`
+        text: `\n[Context from file "${att.name}":]\n${att.data}\n`,
       });
     }
   }
@@ -67,9 +76,9 @@ export const streamChat = async (
   }
 
   // Sanitize history to match API expected format
-  const historyParts = history.map(h => ({
+  const historyParts = history.map((h) => ({
     role: h.role,
-    parts: h.parts
+    parts: h.parts,
   }));
 
   const chat = ai.chats.create({
@@ -77,29 +86,32 @@ export const streamChat = async (
     history: historyParts,
     config: {
       tools: tools.length > 0 ? tools : undefined,
-    }
+    },
   });
 
   return chat.sendMessageStream({
-    message: currentParts.length === 1 && currentParts[0].text ? currentParts[0].text : currentParts
+    message:
+      currentParts.length === 1 && currentParts[0].text
+        ? currentParts[0].text
+        : currentParts,
   });
 };
 
 export const generateImage = async (prompt: string, size: ImageGenSize) => {
   await ensureApiKey(); // Required for Pro Image model
   const ai = getAI();
-  
+
   const response = await ai.models.generateContent({
     model: ModelId.GEMINI_3_PRO_IMAGE,
     contents: {
-      parts: [{ text: prompt }]
+      parts: [{ text: prompt }],
     },
     config: {
       imageConfig: {
         imageSize: size,
-        aspectRatio: '1:1', 
-      }
-    }
+        aspectRatio: "1:1",
+      },
+    },
   });
 
   const images: string[] = [];
@@ -115,15 +127,15 @@ export const generateImage = async (prompt: string, size: ImageGenSize) => {
 
 export const editImage = async (base64Image: string, prompt: string) => {
   const ai = getAI();
-  
+
   const response = await ai.models.generateContent({
     model: ModelId.GEMINI_2_5_FLASH_IMAGE,
     contents: {
       parts: [
         {
           inlineData: {
-            mimeType: 'image/jpeg',
-            data: base64Image.split(',')[1],
+            mimeType: "image/jpeg",
+            data: base64Image.split(",")[1],
           },
         },
         { text: prompt },
@@ -142,9 +154,12 @@ export const editImage = async (base64Image: string, prompt: string) => {
   return images;
 };
 
-export const generateSlideContent = async (topic: string, count: number): Promise<PresentationStructure | null> => {
+export const generateSlideContent = async (
+  topic: string,
+  count: number,
+): Promise<PresentationStructure | null> => {
   const ai = getAI();
-  
+
   const response = await ai.models.generateContent({
     model: ModelId.GEMINI_3_FLASH,
     contents: `Create a McKinsey-style management consulting presentation outline about: ${topic}.
@@ -167,28 +182,31 @@ export const generateSlideContent = async (topic: string, count: number): Promis
             items: {
               type: Type.OBJECT,
               properties: {
-                title: { type: Type.STRING, description: "Full sentence action title" },
-                content: { 
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING }
+                title: {
+                  type: Type.STRING,
+                  description: "Full sentence action title",
                 },
-                speakerNotes: { type: Type.STRING }
+                content: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING },
+                },
+                speakerNotes: { type: Type.STRING },
               },
-              required: ["title", "content"]
-            }
+              required: ["title", "content"],
+            },
           },
           sentiment: {
             type: Type.STRING,
-            enum: ["positive", "neutral", "negative", "urgent"]
+            enum: ["positive", "neutral", "negative", "urgent"],
           },
           themeColor: {
             type: Type.STRING,
-            description: "Hex color code for the theme"
-          }
+            description: "Hex color code for the theme",
+          },
         },
-        required: ["slides", "sentiment", "themeColor"]
-      }
-    }
+        required: ["slides", "sentiment", "themeColor"],
+      },
+    },
   });
 
   if (response.text) {
@@ -206,24 +224,28 @@ export const analyzeStock = async (ticker: string) => {
   const ai = getAI();
   const response = await ai.models.generateContent({
     model: ModelId.GEMINI_3_PRO,
-    contents: `Perform a deep-dive investment analysis on ${ticker}.
-    
-    Persona: You are a Senior Equity Research Analyst at a top-tier Wall Street hedge fund. 
-    Tone: Professional, Objective, Data-Driven, Critical.
-    
-    Requirements:
-    1. Use Google Search to fetch real-time price, recent news, and financial data.
-    2. Analyze Valuation (P/E, Market Cap, EV/EBITDA vs Peers).
-    3. Evaluate the Competitive Moat & Growth Drivers.
-    4. Assess Risks (Macro, Regulatory, Execution).
-    5. Provide a Technical Analysis overview (Trends, Support/Resistance).
-    6. Conclude with an Institutional Verdict: BUY, SELL, or HOLD, with a clear thesis.
-    
-    Format using Markdown with clear headers.`,
+    contents: `
+    Ticker: ${ticker}
+    Role: Lead Quantitative Researcher & Systematic Trader.
+
+    Objective: Provide a data-driven, quantitative-heavy investment thesis. 
+
+    Instructions:
+    1. QUANTITATIVE BENCHMARKING: Use Google Search to find 1Y/3Y/5Y returns. Calculate (or find) the Sharpe Ratio and Beta relative to the S&P 500. Identify the stock's Z-score relative to its 50-day and 200-day Moving Averages.
+    2. FACTOR PROFILE: Classify the stock based on Quantitative Factors: 
+      - Momentum (Price strength vs peers)
+      - Quality (ROIC vs WACC, Debt/Equity)
+      - Value (P/E and EV/EBITDA percentiles)
+    3. SENTIMENT QUANTIFICATION: Search recent news/transcripts. Assign a 'Sentiment Score' (-1.0 to 1.0) based on the frequency of bullish vs. bearish keywords.
+    4. TECHNICAL REGIMES: Identify the current market regime (Trend-following or Mean-reverting). List precise Support/Resistance levels based on high-volume nodes.
+    5. RISK MODELING: Quantify the 'Maximum Drawdown' risk and any upcoming 'Volatility Catalysts' (Earnings, Macro data, FDA decisions).
+    6. SYSTEMATIC VERDICT: Provide a FINAL SIGNAL (BUY, SELL, NEUTRAL) based on an expected Value-at-Risk (VaR) framework.
+    `,
     config: {
       tools: [{ googleSearch: {} }],
-      systemInstruction: "You are a world-class financial analyst. Your analysis must be rigorous, citing numbers and specific events. Do not give generic advice."
-    }
+      systemInstruction:
+        "You are a world-class financial analyst. Your analysis must be rigorous, citing numbers and specific events. Do not give generic advice.",
+    },
   });
   return response;
 };
